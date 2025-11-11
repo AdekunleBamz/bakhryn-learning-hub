@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Instructor from '../components/Instructor'
 import { speakText } from '../utils/tts'
 import Exercises from '../components/Exercises'
 import NinjaScene from '../components/scenes/NinjaScene'
+import { useNavigate } from 'react-router-dom'
+import { useProfiles } from '../context/ProfileContext'
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -19,6 +21,11 @@ function generateProblem() {
 }
 
 function MathLesson() {
+  const nav = useNavigate()
+  const { currentProfile } = useProfiles()
+  useEffect(() => {
+    if (!currentProfile) nav('/profile/new')
+  }, [currentProfile, nav])
   const [seed, setSeed] = useState(0)
   const [practiceCount, setPracticeCount] = useState(0)
   const { question, answer } = useMemo(() => generateProblem(), [seed])

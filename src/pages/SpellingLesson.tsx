@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Instructor from '../components/Instructor'
 import { speakText, speakSpelledThenPronounced } from '../utils/tts'
 import Exercises from '../components/Exercises'
 import NinjaScene from '../components/scenes/NinjaScene'
+import { useNavigate } from 'react-router-dom'
+import { useProfiles } from '../context/ProfileContext'
 
 const WORDS: string[] = [
   'apple','animal','ball','banana','beach','bear','bird','book','bubble','cake',
@@ -26,6 +28,11 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 function SpellingLesson() {
+  const nav = useNavigate()
+  const { currentProfile } = useProfiles()
+  useEffect(() => {
+    if (!currentProfile) nav('/profile/new')
+  }, [currentProfile, nav])
   const [seed, setSeed] = useState(0)
   const deck = useMemo(() => shuffle(WORDS), [seed])
   const [index, setIndex] = useState(0)

@@ -1,13 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AnimatedBackground from '../components/AnimatedBackground'
 import Instructor from '../components/Instructor'
 import AgeGradeSelector from '../components/AgeGradeSelector'
 import SubjectCard from '../components/SubjectCard'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { useProfiles } from '../context/ProfileContext'
 
 function Home() {
-  const [age, setAge] = useState(7)
-  const [grade, setGrade] = useState(2)
+  const nav = useNavigate()
+  const { currentProfile, currentPlacement } = useProfiles()
+  const [age, setAge] = useState(currentPlacement.age ?? 7)
+  const [grade, setGrade] = useState(currentPlacement.grade ?? 2)
+
+  useEffect(() => {
+    if (!currentProfile) {
+      nav('/profile/new')
+      return
+    }
+    setAge(currentPlacement.age ?? 7)
+    setGrade(currentPlacement.grade ?? 2)
+  }, [currentProfile, currentPlacement.age, currentPlacement.grade, nav])
   return (
     <div style={{ position: 'relative', zIndex: 1 }}>
       <AnimatedBackground />

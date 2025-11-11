@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Instructor from '../components/Instructor'
 import { speakText } from '../utils/tts'
 import Exercises from '../components/Exercises'
 import NinjaScene from '../components/scenes/NinjaScene'
+import { useNavigate } from 'react-router-dom'
+import { useProfiles } from '../context/ProfileContext'
 
 const QUESTIONS = [
   { q: 'Find the opposite of big.', a: 'small' },
@@ -11,6 +13,11 @@ const QUESTIONS = [
 ]
 
 function VerbalLesson() {
+  const nav = useNavigate()
+  const { currentProfile } = useProfiles()
+  useEffect(() => {
+    if (!currentProfile) nav('/profile/new')
+  }, [currentProfile, nav])
   const [index, setIndex] = useState(0)
   const [input, setInput] = useState('')
   const item = useMemo(() => QUESTIONS[index % QUESTIONS.length], [index])

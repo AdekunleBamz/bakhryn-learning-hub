@@ -49,8 +49,6 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
         {questions.map((q, qi) => {
           const selected = answers[q.id]
-          const isCorrect = selected !== null && selected === q.correctIndex
-          const isWrong = selected !== null && selected !== q.correctIndex
           return (
             <div key={q.id} className="exercise-question" style={{ display: 'grid', gap: 6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
