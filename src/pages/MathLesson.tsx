@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import Instructor from '../components/Instructor'
 import { speakText } from '../utils/tts'
 import Exercises from '../components/Exercises'
+import NinjaScene from '../components/scenes/NinjaScene'
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -26,6 +27,9 @@ function MathLesson() {
 
   return (
     <div className="grid" style={{ gap: 16 }}>
+      <section style={{ gridColumn: 'span 12' }}>
+        <NinjaScene variant="random" />
+      </section>
       <section className="card" style={{ gridColumn: 'span 12', padding: 16 }}>
         <Instructor name="Mr Bamzz" color="#40c4ff" intro="Welcome to Mathematics! I'm Mr Bamzz. Solve 20 practice problems, then your exercises will unlock." />
       </section>
@@ -53,21 +57,23 @@ function MathLesson() {
         </div>
       </section>
       {practiceCount >= 20 && (
-        <Exercises
-          title="Math Practice"
-          questions={[
-            { id: 'm1', prompt: 'What is 3 + 4?', choices: ['6', '7', '8'], correctIndex: 1 },
-            { id: 'm2', prompt: 'What is 9 − 5?', choices: ['5', '3', '4'], correctIndex: 2 },
-            { id: 'm3', prompt: 'What is 3 × 3?', choices: ['6', '8', '9'], correctIndex: 2 },
-            { id: 'm4', prompt: 'What is 8 − 2?', choices: ['5', '6', '7'], correctIndex: 1 },
-            { id: 'm5', prompt: 'What is 5 + 6?', choices: ['10', '11', '12'], correctIndex: 1 },
-            { id: 'm6', prompt: 'What is 2 × 4?', choices: ['6', '8', '10'], correctIndex: 1 },
-            { id: 'm7', prompt: 'What is 12 − 7?', choices: ['6', '5', '4'], correctIndex: 1 },
-            { id: 'm8', prompt: 'What is 7 + 5?', choices: ['11', '12', '13'], correctIndex: 1 },
-            { id: 'm9', prompt: 'What is 4 × 3?', choices: ['12', '9', '6'], correctIndex: 0 },
-            { id: 'm10', prompt: 'What is 15 − 9?', choices: ['5', '6', '7'], correctIndex: 1 },
-          ]}
-        />
+        <section style={{ gridColumn: 'span 12' }}>
+          <Exercises
+            title="Math Practice"
+            questions={[
+              { id: 'm1', prompt: 'What is 3 + 4?', choices: ['6', '7', '8'], correctIndex: 1 },
+              { id: 'm2', prompt: 'What is 9 − 5?', choices: ['5', '3', '4'], correctIndex: 2 },
+              { id: 'm3', prompt: 'What is 3 × 3?', choices: ['6', '8', '9'], correctIndex: 2 },
+              { id: 'm4', prompt: 'What is 8 − 2?', choices: ['5', '6', '7'], correctIndex: 1 },
+              { id: 'm5', prompt: 'What is 5 + 6?', choices: ['10', '11', '12'], correctIndex: 1 },
+              { id: 'm6', prompt: 'What is 2 × 4?', choices: ['6', '8', '10'], correctIndex: 1 },
+              { id: 'm7', prompt: 'What is 12 − 7?', choices: ['6', '5', '4'], correctIndex: 1 },
+              { id: 'm8', prompt: 'What is 7 + 5?', choices: ['11', '12', '13'], correctIndex: 1 },
+              { id: 'm9', prompt: 'What is 4 × 3?', choices: ['12', '9', '6'], correctIndex: 0 },
+              { id: 'm10', prompt: 'What is 15 − 9?', choices: ['5', '6', '7'], correctIndex: 1 },
+            ]}
+          />
+        </section>
       )}
     </div>
   )

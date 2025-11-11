@@ -1,3 +1,7 @@
+import { useState } from 'react'
+import { speakText } from '../utils/tts'
+import DinoCelebrate from './DinoCelebrate'
+
 type ChoiceQuestion = {
   id: string
   prompt: string
@@ -16,6 +20,7 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
     Object.fromEntries(questions.map(q => [q.id, null])),
   )
   const [showResults, setShowResults] = useState(false)
+  const [celebrateFor, setCelebrateFor] = useState<string | null>(null)
 
   const numAnswered = Object.values(answers).filter(v => v !== null).length
   const score = questions.reduce((acc, q) => {
@@ -26,6 +31,12 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
 
   function selectAnswer(qid: string, idx: number) {
     setAnswers(prev => ({ ...prev, [qid]: idx }))
+    const q = questions.find(x => x.id === qid)
+    if (q && idx === q.correctIndex) {
+      setCelebrateFor(qid)
+      speakText('Well done, champ!')
+      setTimeout(() => setCelebrateFor(current => (current === qid ? null : current)), 1800)
+    }
   }
 
   function reset() {
@@ -34,19 +45,25 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
   }
 
   return (
-    <section className="card" style={{ padding: 16 }}>
+    <section className="card" style={{ padding: 12 }}>
       <h3 style={{ marginTop: 0, color: '#3b247a' }}>{title}</h3>
-      <div style={{ display: 'grid', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
         {questions.map((q, qi) => {
           const selected = answers[q.id]
           const isCorrect = selected !== null && selected === q.correctIndex
           const isWrong = selected !== null && selected !== q.correctIndex
           return (
-            <div key={q.id} className="exercise-question" style={{ display: 'grid', gap: 8 }}>
-              <div style={{ fontWeight: 700, color: '#4b3a9b' }}>
+            <div key={q.id} className="exercise-question" style={{ display: 'grid', gap: 6 }}>
+              <div style={{ fontWeight: 700, color: '#4b3a9b', fontSize: 14 }}>
                 {qi + 1}. {q.prompt}
               </div>
-              <div style={{ display: 'grid', gap: 8 }}>
+              {celebrateFor === q.id && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <DinoCelebrate />
+                  <strong style={{ color: '#0a8f08', fontSize: 13 }}>Well done, champ! 🎉</strong>
+                </div>
+              )}
+              <div style={{ display: 'grid', gap: 6 }}>
                 {q.choices.map((choice, idx) => {
                   const active = selected === idx
                   let bg = '#ffffff'
@@ -64,7 +81,16 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
                     <button
                       key={idx}
                       className="btn"
-                      style={{ textAlign: 'left', background: bg, color, justifyContent: 'flex-start' as const }}
+                      style={{
+                        textAlign: 'left',
+                        background: bg,
+                        color,
+                        justifyContent: 'flex-start' as const,
+                        padding: '6px 8px',
+                        borderRadius: 10,
+                        fontSize: 13,
+                        lineHeight: 1.2,
+                      }}
                       onClick={() => selectAnswer(q.id, idx)}
                       aria-pressed={active}
                     >
@@ -97,6 +123,5 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
   )
 }
 
-import { useState } from 'react'
 export default Exercises
 

@@ -12,7 +12,7 @@
 
 /* Dark theme overrides */
 [data-theme="dark"] {
-  --text: #e9e9ff;
+  --text: #ffe082; /* warm yellow for readability */
   --white: #121226;
   --card: #1a1a33;
   --shadow: 0 10px 20px rgba(0,0,0,0.4), 0 6px 6px rgba(0,0,0,0.32);
@@ -83,7 +83,11 @@ body[data-theme="dark"] {
 }
 
 [data-theme="dark"] .brand-name {
-  color: #d3c7ff;
+  color: #ff3eb5;
+}
+[data-theme="dark"] .brand-bubble {
+  background: linear-gradient(135deg, #ff3eb5, #ff77c8);
+  color: #ffffff;
 }
 
 .nav-links {
@@ -106,7 +110,7 @@ body[data-theme="dark"] {
 }
 
 [data-theme="dark"] .nav-links a {
-  color: #e9e9ff;
+  color: #ffec99;
   background: #1a1a33;
 }
 
@@ -121,7 +125,7 @@ body[data-theme="dark"] {
 }
 
 [data-theme="dark"] .app-footer {
-  color: #acadd6;
+  color: #ffec99;
 }
 
 .grid {
