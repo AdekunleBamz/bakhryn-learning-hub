@@ -20,7 +20,7 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
     Object.fromEntries(questions.map(q => [q.id, null])),
   )
   const [showResults, setShowResults] = useState(false)
-  const [celebrateFor, setCelebrateFor] = useState<string | null>(null)
+  const [celebrateEnd, setCelebrateEnd] = useState(false)
 
   const numAnswered = Object.values(answers).filter(v => v !== null).length
   const score = questions.reduce((acc, q) => {
@@ -30,18 +30,17 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
   }, 0)
 
   function selectAnswer(qid: string, idx: number) {
-    setAnswers(prev => ({ ...prev, [qid]: idx }))
-    const q = questions.find(x => x.id === qid)
-    if (q && idx === q.correctIndex) {
-      setCelebrateFor(qid)
-      speakText('Well done, champ!')
-      setTimeout(() => setCelebrateFor(current => (current === qid ? null : current)), 1800)
-    }
+    if (showResults) return
+    setAnswers(prev => {
+      if (prev[qid] !== null) return prev // prevent changing selection
+      return { ...prev, [qid]: idx }
+    })
   }
 
   function reset() {
     setAnswers(Object.fromEntries(questions.map(q => [q.id, null])))
     setShowResults(false)
+    setCelebrateEnd(false)
   }
 
   return (
@@ -54,24 +53,25 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
           const isWrong = selected !== null && selected !== q.correctIndex
           return (
             <div key={q.id} className="exercise-question" style={{ display: 'grid', gap: 6 }}>
-              <div style={{ fontWeight: 700, color: '#4b3a9b', fontSize: 14 }}>
-                {qi + 1}. {q.prompt}
-              </div>
-              {celebrateFor === q.id && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <DinoCelebrate />
-                  <strong style={{ color: '#0a8f08', fontSize: 13 }}>Well done, champ! 🎉</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ fontWeight: 800, color: '#4b3a9b', fontSize: 14, whiteSpace: 'nowrap' }}>
+                  {qi + 1}.
                 </div>
-              )}
+                <div style={{ fontWeight: 700, color: '#4b3a9b', fontSize: 14 }}>
+                  {q.prompt}
+                </div>
+              </div>
               <div style={{ display: 'grid', gap: 6 }}>
                 {q.choices.map((choice, idx) => {
                   const active = selected === idx
+                  const isChoiceCorrect = showResults && idx === q.correctIndex
+                  const isChoiceWrong = showResults && active && idx !== q.correctIndex
                   let bg = '#ffffff'
                   let color = '#3b247a'
-                  if (showResults && idx === q.correctIndex) {
+                  if (isChoiceCorrect) {
                     bg = '#e6f7ea'
                     color = '#0a8f08'
-                  } else if (showResults && active && idx !== q.correctIndex) {
+                  } else if (isChoiceWrong) {
                     bg = '#fdecea'
                     color = '#e53935'
                   } else if (active) {
@@ -90,17 +90,26 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
                         borderRadius: 10,
                         fontSize: 13,
                         lineHeight: 1.2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
                       }}
                       onClick={() => selectAnswer(q.id, idx)}
                       aria-pressed={active}
+                      disabled={selected !== null || showResults}
                     >
-                      {String.fromCharCode(65 + idx)}. {choice}
+                      <span style={{ width: 16, display: 'inline-block', textAlign: 'center' }}>
+                        {showResults
+                          ? (isChoiceCorrect ? '✓' : (isChoiceWrong ? '✗' : ''))
+                          : (active ? '✓' : String.fromCharCode(65 + idx))}
+                      </span>
+                      <span>{choice}</span>
                     </button>
                   )
                 })}
               </div>
               {showResults && q.explanation && (
-                <div style={{ color: '#5b5b6d' }}>
+                <div style={{ color: '#5b5b6d', fontSize: 12 }}>
                   Hint: {q.explanation}
                 </div>
               )}
@@ -109,14 +118,30 @@ function Exercises({ title = 'Practice Exercises', questions }: ExercisesProps) 
         })}
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12, flexWrap: 'wrap' }}>
-        <button className="btn primary" onClick={() => setShowResults(true)} disabled={numAnswered < questions.length}>
+        <button
+          className="btn primary"
+          onClick={() => {
+            setShowResults(true)
+            const pass = score >= 8
+            setCelebrateEnd(pass)
+            if (pass) {
+              speakText(`Well done, champ! You scored ${score} out of ${questions.length}.`)
+            } else {
+              speakText(`You scored ${score} out of ${questions.length}. Pass mark is eight. Please reset and try again.`)
+            }
+          }}
+          disabled={numAnswered < questions.length}
+        >
           ✅ Check answers
         </button>
         <button className="btn" onClick={reset}>🔄 Try again</button>
         {showResults && (
-          <span style={{ fontWeight: 800, color: score === questions.length ? '#0a8f08' : '#3b247a' }}>
-            Score: {score} / {questions.length}
-          </span>
+          <>
+            <span style={{ fontWeight: 800, color: score >= 8 ? '#0a8f08' : '#e53935' }}>
+              Score: {score} / {questions.length} {score >= 8 ? '(Pass)' : '(Try again)'}
+            </span>
+            {celebrateEnd && <DinoCelebrate />}
+          </>
         )}
       </div>
     </section>
